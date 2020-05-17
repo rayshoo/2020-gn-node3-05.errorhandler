@@ -49,4 +49,45 @@ router.post('/save', async(req, res, next)=>{
     next(e); // errorcode 전송
   }
 })
+
+router.get('/view/:id', async(req, res, next)=>{
+  let id = req.params.id;
+  let pugVals = {cssFile : 'board', jsFile : 'board'};
+  let sql = 'SELECT * FROM board WHERE id=?';
+  let connect, result;
+  try{
+    connect = await pool.getConnection();
+    result = (await connect.query(sql, [id]))[0][0];
+    connect.release();
+    result.created = moment(result.crated).format('YYYY-MM-DD HH:mm:ss');
+
+    // res.json(result);
+    pugVals.data = result;
+    res.render('board/view.pug', pugVals);
+  }
+  catch(e){
+    connect.release();
+    next(e);
+  }
+})
+
+router.get('/remove/:id', async(req, res, next)=>{
+  let id = req.params.id;
+  let sql = 'DELETE FROM board WHERE id=?'
+  let connect, result;
+  try{
+    connect = await pool.getConnection();
+    result = await connect.query(sql, [id]);
+    connect.release;
+    result[0].affectedRows == 1 ? res.send(alert('삭제되었습니다', '/board')) : res.send(alert('삭제가 실행되지 않았습니다. 관리자에게 문의하세요', '/board'));
+    // res.json(result);
+    // res.redirect('/board/list');
+  }
+  catch(e){
+    connect.release();
+    // console.log(e);
+    next(e);
+  }
+})
+
 module.exports = router;

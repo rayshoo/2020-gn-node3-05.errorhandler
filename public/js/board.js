@@ -19,3 +19,10 @@ function onSubmit(f){
   }
   return true;
 }
+
+document.querySelectorAll('.board-link').forEach((v)=>{
+  // console.log(v.dataset.id);
+  v.addEventListener('click', function(){
+    location.href = '/board/view/' + this.dataset.id;
+  })
+});
